@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "azure-keyvault-browser"
+version = "0.0.1"
+description = "A tool for browsing and searching for secrets in Azure Key Vault"
+authors = ["Craig Gumbley <craiggumbley@gmail.com>"]
+license = "MIT"
+
+[tool.mypy]
+[[tool.mypy.overrides]]
+module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "fast_autocomplete.*", "validators.*",]
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+textual = "^0.1.12"
+toml = "^0.10.2"
+rich = "^10.11.0"
+textual-inputs = "^0.1.2"
+click = "^8.0.3"
+validators = "^0.18.2"
+azure-identity = "^1.7.1"
+azure-keyvault-secrets = "^4.3.0"
+pyperclip = "^1.8.2"
+aiohttp = "^3.8.1"
+
+[tool.poetry.dev-dependencies]
+black = "^21.9b0"
+pre-commit = "^2.15.0"
+mypy = "^0.910"
+types-toml = "^0.10.0"
+types-setuptools = "^57.4.2"
+isort = "^5.10.1"
+darglint = "^1.8.1"
+flake8 = "^4.0.1"
+
+[tool.poetry.scripts]
+kv = "azure_keyvault_browser.app:run"
+
+[tool.poetry.dependencies.fast-autocomplete]
+extras = [ "pylev",]
+version = "^0.9.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
