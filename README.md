@@ -25,6 +25,12 @@ Once the app is installed you can run it from your terminal with the `kv` comman
 kv
 ```
 
+Alternatively, you can run the app with docker to keep your local dependencies squeaky clean 🧹
+
+```bash
+docker run --rm -it --volume $HOME:/app --volume $HOME/.azure:/root/.azure ghcr.io/chelnak/azure-keyvault-browser:latest
+```
+
 ### Authentication
 
 `azure-keyvault-browser` uses azure cli authentication. Before you use the app ensure that you have logged in and set your subscription.
