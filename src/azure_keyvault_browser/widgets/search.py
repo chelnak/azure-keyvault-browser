@@ -4,7 +4,8 @@ import string
 from typing import Any
 
 from azure.keyvault.secrets import SecretProperties
-from fast_autocomplete import AutoComplete
+
+# from fast_autocomplete import AutoComplete
 from rich.console import RenderableType
 from rich.padding import Padding
 from rich.panel import Panel
@@ -13,139 +14,110 @@ from rich.text import Text
 from textual import events
 from textual.keys import Keys
 from textual.reactive import Reactive, watch
-from textual_inputs import TextInput
-from textual_inputs.events import InputOnChange
+from textual.widget import Widget
+from textual_inputs.events import InputOnChange, InputOnFocus
 
-from .. import styles
+from .. import search, styles
 from .flash import FlashMessageType, ShowFlashNotification
 
 
-class SearchWidget(TextInput):
-    """A custom search widget."""
+# https://whoosh.readthedocs.io/en/latest/indexing.html
+class SearchWidget(Widget):
+    """
+    A simple text input widget.
 
-    autocompleter: AutoComplete = None
+    Args:
+        name (Optional[str]): The unique name of the widget. If None, the
+            widget will be automatically named.
+        value (str, optional): Defaults to "". The starting text value.
+        placeholder (str, optional): Defaults to "". Text that appears
+            in the widget when value is "" and the widget is not focused.
+        title (str, optional): Defaults to "". A title on the top left
+            of the widget's border.
+        password (bool, optional): Defaults to False. Hides the text
+            input, replacing it with bullets.
+
+    Attributes:
+        value (str): the value of the text field
+        placeholder (str): The placeholder message.
+        title (str): The displayed title of the widget.
+        has_password (bool): True if the text field masks the input.
+        has_focus (bool): True if the widget is focused.
+        cursor (Tuple[str, Style]): The character used for the cursor
+            and a rich Style object defining its appearance.
+
+    Messages:
+        InputOnChange: Emitted when the contents of the input changes.
+        InputOnFocus: Emitted when the widget becomes focused.
+
+    Examples:
+
+    .. code-block:: python
+
+        from textual_inputs import TextInput
+
+        email_input = TextInput(
+            name="email",
+            placeholder="enter your email address...",
+            title="Email",
+        )
+
+    """
+
     value: Reactive[str] = Reactive("")
     valid: Reactive[bool] = Reactive(True)
+    cursor: tuple[str, Style] = (
+        "|",
+        Style(
+            color="white",
+            blink=True,
+            bold=True,
+        ),
+    )
+    _cursor_position: Reactive[int] = Reactive(0)
+    _has_focus: Reactive[bool] = Reactive(False)
 
-    def __init__(self) -> None:
-        """A custom search widget."""
-
-        super().__init__(name="search")
-
+    def __init__(
+        self,
+        **kwargs: Any,
+    ) -> None:
+        self.name = "search"
+        super().__init__(self.name, **kwargs)
+        self.placeholder = ""
         self.title = f"🔍 [{styles.GREY}]search[/]"
         self.visible = True
+        self.has_password = False
+        self._cursor_position = len(self.value)
+
+    def __rich_repr__(self):
+        yield "name", self.name
+        yield "title", self.title
+        if self.has_password:
+            value = "".join("•" for _ in self.value)
+        else:
+            value = self.value
+        yield "value", value
+
+    @property
+    def has_focus(self) -> bool:
+        """
+        Produces True if widget is focused.
+
+        Returns:
+            bool: True if widget is focused
+        """
+
+        return self._has_focus
 
     async def on_mount(self) -> None:
         """Actions that are executed when the widget is mounted."""
 
         async def map(nodes: list[SecretProperties]):
-            searchable_words, synonyms = self.map_nodes(nodes=nodes)
-            self.autocompleter = AutoComplete(words=searchable_words, synonyms=synonyms)
-            self.log("Searchable nodes have been mapped")
+            words = [x.name.lower() for x in nodes]
+            search.index(words)
+            self.log("Searchable nodes have been indexed")
 
         watch(self.app, "searchable_nodes", map)
-
-    async def clear(self) -> None:
-        """Clear the search field."""
-
-        self.value = ""
-        self.refresh(layout=True)
-
-    async def handle_input_on_change(self) -> None:
-        """Handle an InputOnChange message."""
-
-        self.refresh()
-
-    async def on_key(self, event: events.Key) -> None:
-        """Handle a key press.
-
-        Args:
-            event (events.Key): The event containing the pressed key.
-        """
-
-        if event.key == Keys.Enter:
-
-            if len(self.value) == 0:
-                await self.post_message_from_child(
-                    ShowFlashNotification(
-                        self,
-                        type=FlashMessageType.WARNING,
-                        value="No search term specified. Please enter a search term.",
-                    )
-                )
-
-            elif self.app.search_result and self.app.search_result[0] == "none":
-                await self.post_message_from_child(
-                    ShowFlashNotification(
-                        self,
-                        type=FlashMessageType.ERROR,
-                        value=f'No results found for "{self.value}".',
-                    )
-                )
-            else:
-                await self.app.set_focus(self.app.secrets)
-
-        elif event.key == "ctrl+h":  # Backspace
-            if len(self.value) == 1:
-                self.app.search_result = []
-
-            if len(self.value) > 1:
-                await self.search(search_string=self.value)
-
-        elif event.key in string.printable:
-
-            search_string = self.value or event.key
-            await self.search(search_string=search_string)
-
-        await self.post_message(InputOnChange(self))
-
-    async def search(self, search_string: str) -> None:
-        """Search for a string in the autocompleter.
-
-        Args:
-            search_string (str): The string to search for.
-        """
-
-        if search_string:
-            result = self.autocompleter.get_tokens_flat_list(search_string)
-            self.app.search_result = result if len(result) > 0 else ["none"]
-            await self.toggle_field_status(valid=len(result) > 0)
-        else:
-            self.app.search_result = []
-
-    def map_nodes(
-        self, nodes: list[SecretProperties]
-    ) -> tuple[dict[str, Any], dict[str, list[str]]]:
-        """Build a map of nodes and synonyms.
-
-        Args:
-            nodes (dict[NodeID, TreeNode]): A dictionary of nodes.
-
-        Returns:
-            tuple[dict[str, Any], dict[str, list[str]]]: A tuple containing searchable_words and synonyms.
-        """
-
-        searchable_words: dict[str, Any] = {}
-        synonyms: dict[str, list[str]] = {}
-        for node in nodes:
-            name = node.name.lower()
-            searchable_words[name] = {}
-
-            # Secret names must can contain Alphanumerics and hyphens (dash).
-            # So we can make a niave attempt at synonyms.
-            name_words = name.split("-")
-            synonyms[name] = name_words if len(name_words) > 1 else []
-
-        return searchable_words, synonyms
-
-    async def toggle_field_status(self, valid=True) -> None:
-        """Toggles field status.
-
-        Args:
-            valid (bool): Whether the field is valid or not.
-        """
-
-        self.valid = valid
 
     def render(self) -> RenderableType:
         """Render the widget.
@@ -181,3 +153,201 @@ class SearchWidget(TextInput):
             ),
             pad=(0, 0),
         )
+
+    def _conceal_or_reveal(self, segment: str) -> str:
+        """
+        Produce the segment either concealed like a password or as it
+        was passed.
+
+        Args:
+            segment (str): The segment to conceal or reveal
+
+        Returns:
+            str: The concealed or revealed segment
+        """
+        if self.has_password:
+            return "".join("•" for _ in segment)
+        return segment
+
+    def _render_text_with_cursor(self) -> list[str | tuple[str, Style]]:
+        """
+        Produces the renderable Text object combining value and cursor
+
+        Returns:
+            list[str | tuple[str, Style]] - The renderable text
+        """
+
+        segments: list[str | tuple[str, Style]] = []
+
+        if len(self.value) == 0:
+            segments = [self.cursor]
+        elif self._cursor_position == 0:
+            segments = [self.cursor, self._conceal_or_reveal(self.value)]
+        elif self._cursor_position == len(self.value):
+            segments = [self._conceal_or_reveal(self.value), self.cursor]
+        else:
+            segments = [
+                self._conceal_or_reveal(self.value[: self._cursor_position]),
+                self.cursor,
+                self._conceal_or_reveal(self.value[self._cursor_position :]),
+            ]
+
+        return segments
+
+    async def on_focus(self, event: events.Focus) -> None:
+        self._has_focus = True
+        await self._emit_on_focus()
+
+    async def on_blur(self, event: events.Blur) -> None:
+        self._has_focus = False
+
+    async def on_key(self, event: events.Key) -> None:
+
+        if event.key == "left":
+            if self._cursor_position == 0:
+                self._cursor_position = 0
+            else:
+                self._cursor_position -= 1
+
+        elif event.key == "right":
+            if self._cursor_position != len(self.value):
+                self._cursor_position = self._cursor_position + 1
+
+        elif event.key == "home":
+            self._cursor_position = 0
+
+        elif event.key == "end":
+            self._cursor_position = len(self.value)
+
+        elif event.key == "ctrl+h":  # Backspace
+            if self._cursor_position == 0:
+                return
+            elif len(self.value) == 1:
+                self.value = ""
+                self._cursor_position = 0
+                await self.toggle_field_status()
+
+            elif len(self.value) == 2:
+                if self._cursor_position == 1:
+                    self.value = self.value[1]
+                    self._cursor_position = 0
+                else:
+                    self.value = self.value[0]
+                    self._cursor_position = 1
+            else:
+                if self._cursor_position == 1:
+                    self.value = self.value[1:]
+                    self._cursor_position = 0
+                elif self._cursor_position == len(self.value):
+                    self.value = self.value[:-1]
+                    self._cursor_position -= 1
+                else:
+                    self.value = (
+                        self.value[: self._cursor_position - 1]
+                        + self.value[self._cursor_position :]
+                    )
+                    self._cursor_position -= 1
+
+            if len(self.value) == 1:
+                self.app.search_result = []
+
+            if len(self.value) > 1:
+                await self.search(search_string=self.value)
+
+            await self._emit_on_change(event)
+
+        elif event.key == "delete":
+            if self._cursor_position == len(self.value):
+                return
+            elif len(self.value) == 1:
+                self.value = ""
+            elif len(self.value) == 2:
+                if self._cursor_position == 1:
+                    self.value = self.value[0]
+                else:
+                    self.value = self.value[1]
+            else:
+                if self._cursor_position == 0:
+                    self.value = self.value[1:]
+                else:
+                    self.value = (
+                        self.value[: self._cursor_position]
+                        + self.value[self._cursor_position + 1 :]
+                    )
+            await self._emit_on_change(event)
+
+        elif event.key == Keys.Enter:
+
+            if len(self.value) == 0:
+                await self.post_message_from_child(
+                    ShowFlashNotification(
+                        self,
+                        type=FlashMessageType.WARNING,
+                        value="No search term specified. Please enter a search term.",
+                    )
+                )
+
+            elif self.app.search_result and self.app.search_result[0] == "none":
+                await self.post_message_from_child(
+                    ShowFlashNotification(
+                        self,
+                        type=FlashMessageType.ERROR,
+                        value=f'No results found for "{self.value}".',
+                    )
+                )
+            else:
+                await self.app.set_focus(self.app.secrets)
+
+        elif event.key in string.printable:
+            if self._cursor_position == 0:
+                self.value = event.key + self.value
+            elif self._cursor_position == len(self.value):
+                self.value = self.value + event.key
+            else:
+                self.value = (
+                    self.value[: self._cursor_position]
+                    + event.key
+                    + self.value[self._cursor_position :]
+                )
+
+            if not self._cursor_position > len(self.value):
+                self._cursor_position += 1
+
+            search_string = self.value or event.key
+            await self.search(search_string=search_string)
+
+            await self._emit_on_change(event)
+
+    async def _emit_on_change(self, event: events.Key) -> None:
+        event.stop()
+        await self.emit(InputOnChange(self))
+
+    async def _emit_on_focus(self) -> None:
+        await self.emit(InputOnFocus(self))
+
+    async def toggle_field_status(self, valid=True) -> None:
+        """Toggles field status.
+
+        Args:
+            valid (bool): Whether the field is valid or not.
+        """
+
+        self.valid = valid
+
+    async def search(self, search_string: str) -> None:
+        """Search for a string in the autocompleter.
+
+        Args:
+            search_string (str): The string to search for.
+        """
+        result = search.search(search_string)
+        self.log(f"Search string: {search_string}")
+        self.log(f"Search result: {result}")
+        self.app.search_result = result if len(result) > 0 else ["none"]
+        await self.toggle_field_status(valid=(len(result) > 0))
+
+    async def clear(self) -> None:
+        """Clear the search field."""
+
+        self.value = ""
+        self.refresh(layout=True)

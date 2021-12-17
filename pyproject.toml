@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.mypy]
 [[tool.mypy.overrides]]
-module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "fast_autocomplete.*", "validators.*",]
+module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "whoosh.*", "validators.*",]
 ignore_missing_imports = true
 
 [tool.isort]
@@ -25,6 +25,7 @@ azure-identity = "^1.7.1"
 azure-keyvault-secrets = "^4.3.0"
 pyperclip = "^1.8.2"
 aiohttp = "^3.8.1"
+Whoosh = "^2.7.4"
 
 [tool.poetry.dev-dependencies]
 black = "^21.9b0"
@@ -38,10 +39,6 @@ flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
 kv = "azure_keyvault_browser.app:run"
-
-[tool.poetry.dependencies.fast-autocomplete]
-extras = [ "pylev",]
-version = "^0.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

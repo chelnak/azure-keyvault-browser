@@ -20,6 +20,9 @@ CLI_HELP = """
 keyvault browser is a tool for browsing and searching for secrets in Azure Key Vault.
 """
 
+CONFIG_DIR = f"{os.getenv('HOME')}/.config/azure-keyvault-browser"
+INDEX_DIR = f"{CONFIG_DIR}/index"
+
 
 @validator
 def keyvault_name(name: str) -> bool:
@@ -80,8 +83,11 @@ def get_config(config: str | None = None) -> MutableMapping[str, Any]:
         _config = set_config(config)
 
     else:
-        home = os.getenv("HOME")
-        config_path = f"{home}/.azure-keyvault-browser.toml"
+
+        if not os.path.exists(CONFIG_DIR):
+            os.mkdir(CONFIG_DIR)
+
+        config_path = f"{CONFIG_DIR}/config.toml"
 
         if not os.path.exists(config_path):
             _config = set_config(config_path)
