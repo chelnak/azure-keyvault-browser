@@ -17,7 +17,8 @@ from textual.reactive import Reactive, watch
 from textual.widget import Widget
 from textual_inputs.events import InputOnChange, InputOnFocus
 
-from .. import search, styles
+from .. import styles
+from ..search import Search
 from .flash import FlashMessageType, ShowFlashNotification
 
 
@@ -89,6 +90,8 @@ class SearchWidget(Widget):
         self.has_password = False
         self._cursor_position = len(self.value)
 
+        self.search_engine: Search = Search()
+
     def __rich_repr__(self):
         yield "name", self.name
         yield "title", self.title
@@ -111,13 +114,7 @@ class SearchWidget(Widget):
 
     async def on_mount(self) -> None:
         """Actions that are executed when the widget is mounted."""
-
-        async def map(nodes: list[SecretProperties]):
-            words = [x.name.lower() for x in nodes]
-            search.index(words)
-            self.log("Searchable nodes have been indexed")
-
-        watch(self.app, "searchable_nodes", map)
+        watch(self.app, "searchable_nodes", self.index)
 
     def render(self) -> RenderableType:
         """Render the widget.
@@ -325,6 +322,8 @@ class SearchWidget(Widget):
     async def _emit_on_focus(self) -> None:
         await self.emit(InputOnFocus(self))
 
+    # AKV additional methods
+
     async def toggle_field_status(self, valid=True) -> None:
         """Toggles field status.
 
@@ -334,15 +333,32 @@ class SearchWidget(Widget):
 
         self.valid = valid
 
+    async def index(self, nodes: list[SecretProperties]) -> None:
+        """Create an index from a list of searchable nodes.
+
+        Args:
+            nodes (list[SecretProperties]): A list of secret properties.
+        """
+
+        if len(nodes) == 0:
+            self.log("Nothing to index yet")
+            return
+
+        words = [x.name.lower() for x in nodes]
+        self.search_engine.index = words
+        self.log(f"{len(words)} searchable nodes have been indexed")
+
     async def search(self, search_string: str) -> None:
-        """Search for a string in the autocompleter.
+        """Search for a string.
 
         Args:
             search_string (str): The string to search for.
         """
-        result = search.search(search_string)
+
+        result = self.search_engine.search(search_string)
         self.log(f"Search string: {search_string}")
         self.log(f"Search result: {result}")
+
         self.app.search_result = result if len(result) > 0 else ["none"]
         await self.toggle_field_status(valid=(len(result) > 0))
 

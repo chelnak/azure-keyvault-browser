@@ -60,6 +60,10 @@ def set_config(path: str) -> MutableMapping[str, Any]:
     config["keyvault"] = ask.question(
         f"[b][{styles.GREY}]Key Vault Name[/][/]", validation=keyvault_name
     )
+
+    if not os.path.exists(path):
+        os.mkdir(path)
+
     with open(path, "w") as f:
         toml.dump(config, f)
 
@@ -83,9 +87,6 @@ def get_config(config: str | None = None) -> MutableMapping[str, Any]:
         _config = set_config(config)
 
     else:
-
-        if not os.path.exists(CONFIG_DIR):
-            os.mkdir(CONFIG_DIR)
 
         config_path = f"{CONFIG_DIR}/config.toml"
 
