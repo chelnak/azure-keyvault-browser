@@ -15,10 +15,10 @@ from . import __version__
 from .azure import KeyVault
 from .config import CLI_HELP, get_config
 from .widgets import (
+    FilterWidget,
     FlashWidget,
     HeaderWidget,
     HelpWidget,
-    SearchWidget,
     SecretPropertiesWidget,
     SecretsWidget,
     SecretVersionsWidget,
@@ -56,7 +56,7 @@ class KeyVaultBrowser(App):
 
         await self.view.dock(HeaderWidget(), size=7)
 
-        self.search = SearchWidget()
+        self.search = FilterWidget()
         await self.view.dock(self.search, size=3)
 
         grid = await self.view.dock_grid()

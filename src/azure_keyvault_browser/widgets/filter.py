@@ -23,7 +23,7 @@ from .flash import FlashMessageType, ShowFlashNotification
 
 
 # https://whoosh.readthedocs.io/en/latest/indexing.html
-class SearchWidget(Widget):
+class FilterWidget(Widget):
     """
     A simple text input widget.
 
@@ -85,7 +85,7 @@ class SearchWidget(Widget):
         self.name = "search"
         super().__init__(self.name, **kwargs)
         self.placeholder = ""
-        self.title = f"🔍 [{styles.GREY}]search[/]"
+        self.title = f"🔍 [{styles.GREY}]filter[/]"
         self.visible = True
         self.has_password = False
         self._cursor_position = len(self.value)
@@ -359,9 +359,6 @@ class SearchWidget(Widget):
             return
 
         result = self.search_engine.search(search_string)
-        self.log(f"Search string: {search_string}")
-        self.log(f"Search result: {result}")
-
         self.app.search_result = result if len(result) > 0 else ["none"]
         await self.toggle_field_status(valid=(len(result) > 0))
 

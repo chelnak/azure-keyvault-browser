@@ -23,13 +23,13 @@ class HeaderWidget(Widget):
         self.keys: list[tuple[str, str]] = []
         super().__init__()
         self.layout_size = 1
-        self._key_text: Text | None = None
+        self._key_text: RenderableType | None = None
 
-    def make_key_text(self) -> Text:
+    def make_key_text(self) -> RenderableType:
         """Create text containing all the keys.
 
         Returns:
-            Text: A Text renderable containing all the keys.
+            RenderableType: A renderable object containing all the keys.
         """
 
         text = Text(
@@ -54,7 +54,7 @@ class HeaderWidget(Widget):
             )
             text.append_text(key_text)
 
-        return text
+        return Align.right(text, vertical="bottom", pad=False, height=2)
 
     def render(self) -> RenderableType:
         """Render the widget.
@@ -71,8 +71,8 @@ class HeaderWidget(Widget):
                 self.title,
                 style=Style(color=styles.GREY, bold=True),
             ),
-            vertical="middle",
-            height=4,
+            vertical="bottom",
+            height=3,
             pad=False,
         )
 
