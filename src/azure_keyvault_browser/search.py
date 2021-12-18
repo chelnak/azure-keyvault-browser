@@ -12,11 +12,13 @@ from .config import INDEX_DIR
 
 class NoSchemaException(Exception):
     """Exception raised when no schema is found."""
+
     pass
 
 
 class NoIndexException(Exception):
     """Exception raised when no index is found."""
+
     pass
 
 
@@ -89,7 +91,9 @@ class Search(object):
         """
 
         if not self.__index:
-            raise NoIndexException("Index found. Ensure that you have indexed your nodes.")
+            raise NoIndexException(
+                "Index found. Ensure that you have indexed your nodes."
+            )
 
         query_parser = QueryParser("title", self.__index.schema)
         query = query_parser.parse(query_string)
