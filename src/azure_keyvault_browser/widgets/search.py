@@ -355,6 +355,9 @@ class SearchWidget(Widget):
             search_string (str): The string to search for.
         """
 
+        if not self.search_engine.index:
+            return
+
         result = self.search_engine.search(search_string)
         self.log(f"Search string: {search_string}")
         self.log(f"Search result: {result}")
