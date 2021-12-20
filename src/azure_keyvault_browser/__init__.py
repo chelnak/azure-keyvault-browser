@@ -11,4 +11,3 @@ except ModuleNotFoundError:
     import importlib_metadata
 
     __version__ = importlib_metadata.version("azure_keyvault_browser")
-

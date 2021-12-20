@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.mypy]
 [[tool.mypy.overrides]]
-module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "whoosh.*", "validators.*",]
+module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "whoosh.*", "validators.*","importlib_metadata.*"]
 ignore_missing_imports = true
 
 [tool.isort]
