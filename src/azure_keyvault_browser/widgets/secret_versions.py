@@ -55,7 +55,7 @@ class SecretVersionsWidget(Widget):
         self.refresh(layout=True)
 
     async def update(self, secret_name: str) -> None:
-        """Updates the widget with new job info.
+        """Updates the widget with new secret version info.
 
         Args:
             secret_name (str): The secret name.
