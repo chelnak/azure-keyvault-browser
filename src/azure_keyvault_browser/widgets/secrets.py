@@ -22,7 +22,7 @@ class SecretsWidget(Widget):
     row: int = 0
 
     def __init__(self) -> None:
-        """A job details widget. Used to display builds within a job."""
+        """A secrets details widget. Used to display secrets."""
 
         name = self.__class__.__name__
         super().__init__(name=name)
