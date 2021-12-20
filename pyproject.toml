@@ -14,11 +14,11 @@ ignore_missing_imports = true
 profile = "black"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7"
 textual = "^0.1.12"
 toml = "^0.10.2"
 rich = "^10.11.0"
-textual-inputs = "^0.1.2"
+textual-inputs = "^0.2.0"
 click = "^8.0.3"
 validators = "^0.18.2"
 azure-identity = "^1.7.1"

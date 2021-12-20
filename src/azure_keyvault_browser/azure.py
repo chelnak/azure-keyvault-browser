@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from azure.identity.aio import AzureCliCredential
 from azure.keyvault.secrets import SecretProperties
 from azure.keyvault.secrets.aio import SecretClient
