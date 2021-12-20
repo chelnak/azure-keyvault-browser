@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD026 -->
 # azure-keyvault-browser :lock:
 
-![azure-keyvault-browser](https://github.com/chelnak/azure-keyvault-browser/actions/workflows/ci.yaml/badge.svg) [![PyPI version](https://badge.fury.io/py/azure-keyvault-browser.svg)](https://badge.fury.io/py/azure-keyvault-browser)
+[![Python versions](https://shields.io/pypi/pyversions/azure-keyvault-browser)](https://badge.fury.io/py/azure-keyvault-browser) ![azure-keyvault-browser](https://github.com/chelnak/azure-keyvault-browser/actions/workflows/ci.yaml/badge.svg) [![PyPI version](https://badge.fury.io/py/azure-keyvault-browser.svg)](https://badge.fury.io/py/azure-keyvault-browser)
 
 `azure-keyvault-browser` is a tool for browsing and searching for secrets in Azure Key Vault.
 
@@ -56,8 +56,7 @@ keyvault = ""
 
 ## Compatibility
 
-This project has been tested on macOS and Linux (Arch, Ubuntu 20.04 and above) with Python 3.9 installed. It will likely work on any Linux distribution where Python 3.9 or above is available.
-For Ubuntu 20.04, it may be necessary to install the `python3.9` package.
+This project has been tested on macOS and Linux (Arch, Ubuntu 20.04 and above) with Python 3.9 installed. It will likely work on any Linux distribution where Python 3.7 or above is available.
 
 ## Contributing
 
