@@ -16,7 +16,9 @@ class SecretPropertiesRenderable:
         self.title = f"{properties.name} @ {properties.version}" if properties else ""
         self.properties = (
             {
-                "created on": properties.content_type,
+                "created on": format_datetime(properties.created_on)
+                if properties.created_on
+                else None,
                 "updated on": format_datetime(properties.updated_on)
                 if properties.updated_on
                 else None,

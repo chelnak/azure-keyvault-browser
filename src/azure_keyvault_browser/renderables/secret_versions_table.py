@@ -4,6 +4,7 @@ from azure.keyvault.secrets import SecretProperties
 from rich.table import Table
 
 from .. import styles
+from ..util import format_datetime
 from .paginated_table import PaginatedTableRenderable
 
 
@@ -59,7 +60,7 @@ class SecretVersionsTableRenderable(PaginatedTableRenderable):
         for item in renderables:
             version = item.version
 
-            created_on = item.created_on.strftime("%Y-%m-%d %H:%M:%S")
+            created_on = format_datetime(item.created_on)
 
             table.add_row(version, created_on)
 
