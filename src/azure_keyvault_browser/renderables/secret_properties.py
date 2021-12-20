@@ -18,22 +18,28 @@ class SecretPropertiesRenderable:
             {
                 "created on": format_datetime(properties.created_on)
                 if properties.created_on
-                else None,
+                else "",
                 "updated on": format_datetime(properties.updated_on)
                 if properties.updated_on
-                else None,
+                else "",
                 "expires on": format_datetime(properties.expires_on)
                 if properties.expires_on
-                else None,
+                else "",
                 "not before": format_datetime(properties.not_before)
                 if properties.not_before
-                else None,
-                "content type": properties.content_type,
-                "enabled": properties.enabled,
-                "key id": properties.key_id,
-                "recoverable days": properties.recoverable_days,
-                "recovery level": properties.recovery_level,
-                "tags": properties.tags,
+                else "",
+                "content type": properties.content_type
+                if properties.content_type
+                else "",
+                "enabled": properties.enabled if properties.enabled else "",
+                "key id": properties.key_id if properties.key_id else "",
+                "recoverable days": properties.recoverable_days
+                if properties.recoverable_days
+                else "",
+                "recovery level": properties.recovery_level
+                if properties.recovery_level
+                else "",
+                "tags": properties.tags if properties.tags else "",
             }
             if properties
             else None
