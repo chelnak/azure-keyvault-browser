@@ -61,8 +61,8 @@ def set_config(path: str) -> MutableMapping[str, Any]:
         f"[b][{styles.GREY}]Key Vault Name[/][/]", validation=keyvault_name
     )
 
-    if not os.path.exists(path):
-        os.mkdir(path)
+    if not os.path.exists(os.path.dirname(path)):
+        os.mkdir(os.path.dirname(path))
 
     with open(path, "w") as f:
         toml.dump(config, f)
