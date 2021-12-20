@@ -46,7 +46,7 @@ On first run you will be asked for some information so that the app can build yo
 
 You'll need to enter a valid Key Vault name.
 
-Alternatively you can manually pre-load a config file at `~/azure-keyvault-browser/config.toml` and use the following schema:
+Alternatively you can manually pre-load a config file at `~/.config/azure-keyvault-browser/config.toml` and use the following schema:
 
 ```bash
 # config.toml
