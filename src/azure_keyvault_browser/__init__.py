@@ -1,7 +1,7 @@
 import sys
 
 if (sys.version_info[0], sys.version_info[1]) < (3, 7):
-    sys.exit("azurecr-browser requires Python 3.7 or later.")
+    sys.exit("azure-keyvault-browser requires Python 3.7 or later.")
 
 try:
     import importlib.metadata
