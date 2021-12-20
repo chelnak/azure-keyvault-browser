@@ -28,7 +28,7 @@ kv
 Alternatively, you can run the app with docker to keep your local dependencies squeaky clean 🧹
 
 ```bash
-docker run --rm -it --volume $HOME:/app --volume $HOME/.azure:/root/.azure ghcr.io/chelnak/azure-keyvault-browser:latest
+docker run --rm -it --volume $HOME/.config:/root/.config --volume $HOME/.azure:/root/.azure ghcr.io/chelnak/azure-keyvault-browser:latest
 ```
 
 ### Authentication
