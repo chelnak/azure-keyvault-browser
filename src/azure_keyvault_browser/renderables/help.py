@@ -29,8 +29,8 @@ class HelpRenderable:
             "select": Keys.Enter,
         },
         "secret properties": {
-            "toggle value": Keys.ControlS,
-            "copy value to clipboard": Keys.ControlK,
+            "unlock": Keys.ControlS,
+            "view": Keys.ControlK,
         },
     }
 
