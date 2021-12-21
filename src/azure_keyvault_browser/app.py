@@ -167,4 +167,12 @@ def run(config: str | None, debug: bool) -> None:
     if debug:
         app.run(log="azure-keyvault-browser.log", title=title)
     else:
-        app.run()
+        try:
+            app.run()
+        except Exception:
+            from rich.console import Console
+
+            console = Console()
+            console.print(
+                "💥 It looks like there has been an error. For more information use the --debug option!"
+            )
