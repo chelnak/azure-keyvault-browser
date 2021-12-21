@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyperclip import copy
+import click
 from rich.console import RenderableType
 from rich.panel import Panel
 from rich.style import Style
@@ -88,15 +88,23 @@ class SecretPropertiesWidget(Widget):
         elif key == Keys.ControlK:
 
             if self.reveal_secret_value:
-                copy(self.value)
 
-                self.post_message_from_child_no_wait(
-                    ShowFlashNotification(
-                        self,
-                        type=FlashMessageType.INFO,
-                        value=f'Value for "{self.selected_version.name}" copied to clipboard.',
+                try:
+                    driver = self.app._driver
+                    driver.exit_event.set()
+                    click.edit(self.value)
+                except Exception as e:
+                    self.log(f"Failed to open editor value: {e}")
+                    self.post_message_from_child_no_wait(
+                        ShowFlashNotification(
+                            self,
+                            value="Unable to open editor. Please check your editor settings.",
+                            type=FlashMessageType.ERROR,
+                        )
                     )
-                )
+                finally:
+                    driver.exit_event.clear()
+                    driver.start_application_mode()
 
         self.refresh(layout=True)
 

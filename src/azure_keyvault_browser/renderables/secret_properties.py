@@ -1,17 +1,12 @@
 from __future__ import annotations
 
 from azure.keyvault.secrets import SecretProperties
-from rich.console import Console, ConsoleOptions, Group, RenderResult
+from rich.console import Console, ConsoleOptions, RenderResult
 from rich.table import Table
 from rich.text import Text
 
 from .. import styles
 from ..util import format_datetime
-
-UP = "\u2191"
-DOWN = "\u2193"
-LEFT = "\u2190"
-RIGHT = "\u2192"
 
 
 class SecretPropertiesRenderable:
@@ -65,4 +60,4 @@ class SecretPropertiesRenderable:
             table.add_row("value", "🔒" if self.value == "" else "🔓")
             table.add_row()
 
-        yield Group(table, self.value)
+        yield table
