@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from itertools import cycle
+from collections import deque
 from typing import Any, MutableMapping
 
 import click
@@ -37,7 +37,7 @@ class KeyVaultBrowser(App):
     selected_secret: Reactive[str] = Reactive("")
     searchable_nodes: Reactive[list[SecretProperties]] = Reactive([])
     search_result: Reactive[list[str]] = Reactive([])
-    widget_list: cycle[Widget] = cycle([])
+    widget_deque: deque[Widget] = deque([])
 
     async def on_load(self) -> None:
         """Overrides on_load from App()"""
@@ -47,7 +47,8 @@ class KeyVaultBrowser(App):
         self.client = KeyVault(vault_name=keyvault)
 
         await self.bind("?", "toggle_help", "show help")
-        await self.bind("ctrl+i", "cycle_widget", show=False)
+        await self.bind("ctrl+i", "cycle_widget('forward')", show=False)
+        await self.bind("shift+tab", "cycle_widget('backward')", show=False)
         await self.bind(Keys.Escape, "refocus", show=False)
         await self.bind(Keys.ControlK, "toggle_search", show=False)
 
@@ -80,7 +81,7 @@ class KeyVaultBrowser(App):
         self.help = HelpWidget()
         await self.view.dock(self.help, z=1)
 
-        self.widget_list = cycle(
+        self.widget_deque = deque(
             [self.search, self.secrets, self.versions, self.properties]
         )
 
@@ -116,13 +117,20 @@ class KeyVaultBrowser(App):
         self.log("Handling ShowFlashNotification message")
         await self.flash.update_flash_message(value=message.value, type=message.type)
 
-    async def action_cycle_widget(self) -> None:
-        """Cycle through the widgets."""
+    async def action_cycle_widget(self, direction: str) -> None:
+        """Cycle through the widgets.
 
-        current_widget = next(self.widget_list)
+        Args:
+            direction (str): Whether to cycle "forward" or "backward".
+        """
+
+        way = 1 if direction == "backward" else -1
+        self.widget_deque.rotate(way)
+        current_widget = self.widget_deque[0]
 
         if current_widget.has_focus:
-            current_widget = next(self.widget_list)
+            self.widget_deque.rotate(way)
+            current_widget = self.widget_deque[0]
 
         await self.set_focus(current_widget)
         self.refresh(layout=True)
