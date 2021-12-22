@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
 name: azure-keyvault-browser
 
 on:
@@ -40,6 +42,28 @@ jobs:
       run: |
         source $VENV
         make build
+
+    - uses: actions/upload-artifact@v2
+      name: Upload artifacts ⬆️
+      with:
+        name: dist
+        path: dist/*.whl
+
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request' && github.actor == github.repository_owner) }}
+    needs:
+      - build
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: actions/download-artifact@v2
+      name: Download artifact ⬇️
+      with:
+        name: dist
+        path: dist/
 
     - name: Build image 🐳
       run: docker build . --file Dockerfile --tag $IMAGE_NAME
