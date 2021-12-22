@@ -8,7 +8,7 @@ tag:
 	@git push --follow-tags
 
 # Building
-build: check
+build:
 	@source $(VENV)
 	python tools/bump_version.py
 	rm -rf dist || true
