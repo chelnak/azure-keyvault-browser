@@ -24,6 +24,8 @@ class HelpRenderable:
             "previous row": f"{UP}",
             "next page": f"{RIGHT}",
             "previous page": f"{LEFT}",
+            "next widget": Keys.Tab,
+            "previous widget": Keys.BackTab,
             "first page": "f",
             "last page": "l",
             "select": Keys.Enter,
