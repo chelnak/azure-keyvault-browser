@@ -1,13 +1,17 @@
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "azure-keyvault-browser"
-version = "0.0.1"
+version = "0.0.2"
 description = "A tool for browsing and searching for secrets in Azure Key Vault"
-authors = ["Craig Gumbley <craiggumbley@gmail.com>"]
+authors = [ "Craig Gumbley <craiggumbley@gmail.com>",]
 license = "MIT"
 
 [tool.mypy]
 [[tool.mypy.overrides]]
-module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "whoosh.*", "validators.*","importlib_metadata.*"]
+module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "whoosh.*", "validators.*", "importlib_metadata.*",]
 ignore_missing_imports = true
 
 [tool.isort]
@@ -39,7 +43,3 @@ flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
 kv = "azure_keyvault_browser.app:run"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
