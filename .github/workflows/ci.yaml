@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
 name: azure-keyvault-browser
 
 on:
@@ -41,6 +43,28 @@ jobs:
         source $VENV
         make build
 
+    - uses: actions/upload-artifact@v2
+      name: Upload artifacts ⬆️
+      with:
+        name: dist
+        path: dist/*.whl
+
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request' && github.actor == github.repository_owner) }}
+    needs:
+      - build
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: actions/download-artifact@v2
+      name: Download artifact ⬇️
+      with:
+        name: dist
+        path: dist/
+
     - name: Build image 🐳
       run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
@@ -75,6 +99,12 @@ jobs:
         branch: bump_version
         body: This PR bumps pyproject.toml from ${{ github.ref }}
         base: main
+
+    - name: Install and configure Poetry 🎉
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.1.10
+        virtualenvs-in-project: true
 
     - name: Publish 📦
       if: startsWith(github.ref, 'refs/tags/v')
