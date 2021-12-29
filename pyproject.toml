@@ -11,7 +11,7 @@ license = "MIT"
 
 [tool.mypy]
 [[tool.mypy.overrides]]
-module = [ "textual.*", "pyperclip.*", "textual_inputs.*", "whoosh.*", "validators.*", "importlib_metadata.*",]
+module = [ "textual.*", "textual_inputs.*", "whoosh.*", "validators.*", "importlib_metadata.*",]
 ignore_missing_imports = true
 
 [tool.isort]
@@ -27,7 +27,6 @@ click = "^8.0.3"
 validators = "^0.18.2"
 azure-identity = "^1.7.1"
 azure-keyvault-secrets = "^4.3.0"
-pyperclip = "^1.8.2"
 aiohttp = "^3.8.1"
 Whoosh = "^2.7.4"
 
