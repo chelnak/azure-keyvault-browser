@@ -19,7 +19,7 @@ profile = "black"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-textual = "^0.1.12"
+textual = "0.1.13"
 toml = "^0.10.2"
 rich = "^10.11.0"
 textual-inputs = "^0.2.0"
