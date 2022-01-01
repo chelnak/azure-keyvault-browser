@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "azure-keyvault-browser"
-version = "0.0.2"
+version = "0.0.3"
 description = "A tool for browsing and searching for secrets in Azure Key Vault"
 authors = [ "Craig Gumbley <craiggumbley@gmail.com>",]
 license = "MIT"
